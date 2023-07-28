@@ -64,6 +64,11 @@ func (db *Database) PrepareDB() error {
 	return nil
 }
 
-//func GetUser(id int,db *sql.DB) (User,error) {
-//
-//}
+func (db *Database) GetUser(id int) (User, error) {
+	var user User
+	row := db.oneRow("select id,telegram_id from user where id = ?", id)
+	if err := row.Scan(&user.id, &user.telegram_id); err != nil {
+		return user, err
+	}
+	return user, nil
+}
