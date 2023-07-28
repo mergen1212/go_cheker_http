@@ -16,18 +16,30 @@ type Project struct {
 	user_id int
 }
 
-var databasePath = "./storage.db"
-
-func GetDB() (sql.DB, error) {
-	db, err := sql.Open("sqlite3", databasePath)
-	if err != nil {
-		return *db, err
-	}
-	return *db, nil
+type Database struct {
+	d *sql.DB
 }
 
-func PrepareDB(db *sql.DB) error {
-	_, err := db.Exec(`
+var databasePath = "./storage.db"
+
+func GetDB() (Database, error) {
+	db, err := sql.Open("sqlite3", databasePath)
+	if err != nil {
+		return Database{db}, err
+	}
+	return Database{db}, nil
+}
+
+func (db *Database) exec(query string, args ...any) (sql.Result, error) {
+	return db.d.Exec(query, args...)
+}
+
+func (db *Database) oneRow(query string, args ...any) *sql.Row {
+	return db.d.QueryRow(query, args...)
+}
+
+func (db *Database) PrepareDB() error {
+	_, err := db.exec(`
 	CREATE TABLE IF NOT EXISTS
 	user (
 	    id integer PRIMARY KEY AUTOINCREMENT,
@@ -36,7 +48,7 @@ func PrepareDB(db *sql.DB) error {
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec(`
+	_, err = db.exec(`
 	CREATE TABLE IF NOT EXISTS
 	project(
 	   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,3 +63,7 @@ func PrepareDB(db *sql.DB) error {
 	}
 	return nil
 }
+
+//func GetUser(id int,db *sql.DB) (User,error) {
+//
+//}

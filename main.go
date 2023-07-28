@@ -23,14 +23,13 @@ func sayAliveView(c *gin.Context) {
 func main() {
 	host, port := getHostPort()
 	router := getRouter()
-	database, err := db.GetDB()
+	db, err := db.GetDB()
 	if err != nil {
 		panic(err)
 	}
-	err = db.PrepareDB(&database)
+	err = db.PrepareDB()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(database)
 	router.Run(fmt.Sprintf("%s %d", host, port))
 }
