@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go_cheker_http/pkg/db"
 	"net/http"
 )
 
@@ -12,16 +13,24 @@ func getHostPort() (string, int) {
 
 func getRouter() *gin.Engine {
 	router := gin.Default()
-	router.GET("/:key", sayAlliveView)
+	router.GET("/:key", sayAliveView)
 	return router
 }
 
-func sayAlliveView(c *gin.Context) {
+func sayAliveView(c *gin.Context) {
 	c.JSON(http.StatusNotFound, gin.H{})
 }
-func maim() {
+func main() {
 	host, port := getHostPort()
 	router := getRouter()
+	database, err := db.GetDB()
+	if err != nil {
+		panic(err)
+	}
+	err = db.PrepareDB(&database)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(database)
 	router.Run(fmt.Sprintf("%s %d", host, port))
-
 }

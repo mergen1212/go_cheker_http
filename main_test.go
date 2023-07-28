@@ -17,4 +17,5 @@ func TestNotFound(t *testing.T) {
 	if recorder.Code != 404 {
 		t.Error("Must be 404 but", recorder.Code)
 	}
+
 }
