@@ -1,6 +1,8 @@
 package db
 
 import (
+	"fmt"
+	"os"
 	"testing"
 )
 
@@ -11,23 +13,17 @@ func TestPrepareDBMustCreateTables(t *testing.T) {
 	tables := []string{"user", "project"}
 	for i := 0; i < len(tables); i++ {
 		table := tables[i]
-		rows, err := db.Query("select name from sqlite_master where name = ?", table)
+		row := db.QueryRow("select name from sqlite_master where name = ?", table)
+		var dbTableName string
+		err := row.Scan(&dbTableName)
 		if err != nil {
-			t.Error("Error happened", err)
-		}
-		defer rows.Close()
-
-		if !rows.Next() {
-			t.Error("table not found", table)
+			t.Error("happened error", err)
 		}
 
-		for rows.Next() {
-			var dbTable string
-			rows.Scan(&dbTable)
-			if dbTable != table {
-				t.Error("table not found", table)
-			}
+		if dbTableName != table {
+			t.Error(fmt.Sprintf("Table %s not found", table))
 		}
-
 	}
+
+	os.Remove(databasePath)
 }
